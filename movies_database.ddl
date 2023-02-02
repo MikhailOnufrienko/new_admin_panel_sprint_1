@@ -13,6 +13,7 @@ CREATE TABLE IF NOT EXISTS content.film_work (
 
 CREATE TABLE IF NOT EXISTS content.genre (
     id uuid PRIMARY KEY,
+    name VARCHAR(255),
     description TEXT,
     created TIMESTAMP WITH TIME ZONE,
     modified TIMESTAMP WITH TIME ZONE
