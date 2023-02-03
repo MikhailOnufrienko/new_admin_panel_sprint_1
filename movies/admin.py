@@ -15,13 +15,16 @@ class GenreAdmin(admin.ModelAdmin):
 
 
 class PersonAdmin(admin.ModelAdmin):
-    pass
+    list_display = ('full_name', 'created', 'modified',)
+    search_fields = ('full_name',)
 
 
 class FilmworkAdmin(admin.ModelAdmin):
     inlines = (GenreFilmworkInline,)
     list_display = ('title', 'description', 'type', 'creation_date', 'rating',)
     empty_value_display = '-empty-'
+    list_filter = ('type',)
+    search_fields = ('title',)
 
 
 admin.site.register(Genre, GenreAdmin)
