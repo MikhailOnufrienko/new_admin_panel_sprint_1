@@ -10,18 +10,20 @@ class PersonFilmworkInline(admin.TabularInline):
     model = PersonFilmwork
 
 
-@admin.register(Genre)
 class GenreAdmin(admin.ModelAdmin):
-    pass
+    list_display = ('name', 'description', 'created',)
 
 
-@admin.register(Person)
 class PersonAdmin(admin.ModelAdmin):
     pass
 
 
-@admin.register(Filmwork)
 class FilmworkAdmin(admin.ModelAdmin):
     inlines = (GenreFilmworkInline,)
-    list_display = ('title', 'type', 'creation_date', 'rating',)
+    list_display = ('title', 'description', 'type', 'creation_date', 'rating',)
+    empty_value_display = '-empty-'
 
+
+admin.site.register(Genre, GenreAdmin)
+admin.site.register(Person, PersonAdmin)
+admin.site.register(Filmwork, FilmworkAdmin)

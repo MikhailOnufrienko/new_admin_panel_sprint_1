@@ -1,15 +1,11 @@
 from django.db import models
-import uuid
 from .mixins import UUIDMixin, TimeStampedMixin
 from django.core.validators import MinValueValidator, MaxValueValidator
 
 
 class Genre(UUIDMixin, TimeStampedMixin):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    name = models.CharField('Название', max_length=255)
+    name = models.TextField('Название')
     description = models.TextField('Описание', blank=True)
-    created = models.DateTimeField(auto_now_add=True)
-    modified = models.DateTimeField(auto_now=True)
 
     class Meta:
         db_table = "content\".\"genre"
@@ -34,19 +30,15 @@ class Person(UUIDMixin, TimeStampedMixin):
 
 class Filmwork(UUIDMixin, TimeStampedMixin):
 
-    class TypeChoices(models.TextChoices):
-        MOVIE = 'Фильм', 'Фильм'
-        TV_SHOW = 'Сериал', 'Сериал'
+    class Types(models.TextChoices):
+        MOVIE = 'movie', 'movie'
+        TV_SHOW = 'tv_show', 'tv_show'
 
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     title = models.TextField('Название')
     description = models.TextField('Описание', blank=True)
-    genres = models.ManyToManyField(Genre, through='GenreFilmwork')
-    creation_date = models.DateField('Дата выхода'),
+    creation_date = models.DateField('Дата создания фильма'),
     rating = models.FloatField('Рейтинг', blank=True, validators=[MinValueValidator(0), MaxValueValidator(100)]),
-    type = models.TextField('Тип', choices=TypeChoices.choices, default=TypeChoices.MOVIE),
-    created = models.DateTimeField(auto_now_add=True)
-    modified = models.DateTimeField(auto_now=True)
+    type = models.TextField('Тип', choices=Types.choices, default=Types.MOVIE),
 
     class Meta:
         db_table = "content\".\"film_work"
