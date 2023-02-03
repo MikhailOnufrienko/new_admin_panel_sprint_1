@@ -36,9 +36,9 @@ class Filmwork(UUIDMixin, TimeStampedMixin):
 
     title = models.TextField('Название')
     description = models.TextField('Описание', blank=True)
-    creation_date = models.DateField('Дата создания фильма'),
-    rating = models.FloatField('Рейтинг', blank=True, validators=[MinValueValidator(0), MaxValueValidator(100)]),
-    type = models.TextField('Тип', choices=Types.choices, default=Types.MOVIE),
+    creation_date = models.DateField('Дата создания фильма')
+    rating = models.FloatField('Рейтинг', blank=True, validators=[MinValueValidator(0), MaxValueValidator(100)])
+    type = models.TextField('Тип', choices=Types.choices, default=Types.MOVIE)
 
     class Meta:
         db_table = "content\".\"film_work"
