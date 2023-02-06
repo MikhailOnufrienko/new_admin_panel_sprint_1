@@ -42,7 +42,7 @@ CREATE TABLE IF NOT EXISTS content.person_film_work (
 );
 
 CREATE INDEX film_work_title_idx ON content.film_work (title);
-CREATE INDEX film_work_creation_date_rating_idx ON content.film_work (creation_date, rating);
+CREATE INDEX film_work_creation_date_idx ON content.film_work (creation_date);
 CREATE INDEX person_idx ON content.person (full_name);
 CREATE UNIQUE INDEX film_work_genre_idx ON content.genre_film_work (film_work_id, genre_id);
 CREATE UNIQUE INDEX film_work_person_role_idx ON content.person_film_work (film_work_id, person_id, role);
