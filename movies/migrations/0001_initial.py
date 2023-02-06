@@ -86,4 +86,24 @@ class Migration(migrations.Migration):
                 'db_table': 'content"."genre_film_work',
             },
         ),
+        migrations.AddIndex(
+            model_name='filmwork',
+            index=models.Index(fields=['title'], name='film_work_title_idx'),
+        ),
+        migrations.AddIndex(
+            model_name='filmwork',
+            index=models.Index(fields=['creation_date'], name='film_work_creation_date_idx'),
+        ),
+        migrations.AddIndex(
+            model_name='genrefilmwork',
+            index=models.Index(fields=['film_work_id', 'genre_id'], name='film_work_genre_idx'),
+        ),
+        migrations.AddIndex(
+            model_name='person',
+            index=models.Index(fields=['full_name'], name='person_idx'),
+        ),
+        migrations.AddIndex(
+            model_name='personfilmwork',
+            index=models.Index(fields=['film_work_id', 'person_id', 'role'], name='film_work_person_role_idx'),
+        ),
     ]
