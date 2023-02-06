@@ -1,16 +1,19 @@
 from django.contrib import admin
+from django.utils.translation import gettext_lazy as _
 from .models import Genre, Filmwork, Person, GenreFilmwork, PersonFilmwork
 
 
 class GenreFilmworkInline(admin.TabularInline):
     model = GenreFilmwork
     extra = 0
+    verbose_name = _('genre filmwork')
 
 
 class PersonFilmworkInline(admin.TabularInline):
     model = PersonFilmwork
     autocomplete_fields = ('person',)
     extra = 0
+    verbose_name = _('person filmwork')
 
 
 class GenreAdmin(admin.ModelAdmin):
