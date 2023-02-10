@@ -8,6 +8,7 @@ colorama==0.4.6
 darglint==1.8.1
 distlib==0.3.6
 Django==3.2.16
+django-debug-toolbar==3.4.0
 django-split-settings==1.2.0
 docutils==0.19
 eradicate==2.1.0
