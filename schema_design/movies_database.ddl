@@ -5,6 +5,7 @@ CREATE TABLE IF NOT EXISTS content.film_work (
     title TEXT NOT NULL,
     description TEXT,
     creation_date DATE,
+    file_path TEXT,
     rating FLOAT,
     type TEXT NOT NULL,
     created TIMESTAMP WITH TIME ZONE,
@@ -28,15 +29,15 @@ CREATE TABLE IF NOT EXISTS content.person (
 
 CREATE TABLE IF NOT EXISTS content.genre_film_work (
     id uuid PRIMARY KEY,
-    genre_id uuid NOT NULL,
     film_work_id uuid NOT NULL,
+    genre_id uuid NOT NULL,
     created TIMESTAMP WITH TIME ZONE
 );
 
 CREATE TABLE IF NOT EXISTS content.person_film_work (
     id uuid PRIMARY KEY,
-    person_id uuid NOT NULL,
     film_work_id uuid NOT NULL,
+    person_id uuid NOT NULL,
     role TEXT NOT NULL,
     created TIMESTAMP WITH TIME ZONE
 );
