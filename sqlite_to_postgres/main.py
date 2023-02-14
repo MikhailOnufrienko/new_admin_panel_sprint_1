@@ -1,17 +1,24 @@
+import os
+import sqlite3
+
+from dotenv import load_dotenv
 import psycopg2
 
 from data_extractor import SQLiteExtractor
 from data_loader import load_data
-from db_dataclasses import Genre, Person, Filmwork, GenreFilmwork, PersonFilmwork
-import sqlite3
+from db_dataclasses import (Filmwork, Genre, GenreFilmwork, Person,
+                            PersonFilmwork)
+
+
+load_dotenv()
 
 dsn = {
-    "dbname": "movies_database",
-    "user": "postgres",
-    "password": "GhastangsTmihan13",
-    "host": "127.0.0.1",
-    "port": 5432,
-    "options": "-c search_path=content",
+    'dbname': 'movies_database',
+    'user': 'postgres',
+    'password': os.environ.get('DB_PASSWORD'),
+    'host': '127.0.0.1',
+    'port': 5432,
+    'options': '-c search_path=content',
 }
 
 from_db = 'db.sqlite'
@@ -63,6 +70,7 @@ if __name__ == '__main__':
                 extractor = SQLiteExtractor(sqlite_conn)
                 records = []
                 curs_pg = pg_conn.cursor()
+
                 for chunk in extractor.extract(table):
                     try:
                         for row in chunk:
@@ -81,7 +89,9 @@ if __name__ == '__main__':
                             if table == 'person_film_work':
                                 record = PersonFilmwork(*row)
                                 records.append(record)
+
                     except Exception as e:
                         print(f'Error occurred when saving to {table}: {e}')
+
                     load_data(curs_pg, records, table)
                     pg_conn.commit()

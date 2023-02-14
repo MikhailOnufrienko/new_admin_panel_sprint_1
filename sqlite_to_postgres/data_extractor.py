@@ -1,4 +1,9 @@
 class SQLiteExtractor:
+    """A class to represent the mechanism of extracting data
+    from an SQLite database.
+
+    The data are extracted by chunks.
+    """
     def __init__(self, conn, chunk_size=1000):
         self.conn = conn
         self.chunk_size = chunk_size
@@ -6,7 +11,7 @@ class SQLiteExtractor:
     def extract(self, table):
         curs = self.conn.cursor()
         try:
-            query = f"SELECT * FROM {table}"
+            query = f'SELECT * FROM {table}'
             curs.execute(query)
         except ValueError:
             print(f'No such table: {table}')

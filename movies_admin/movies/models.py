@@ -1,7 +1,8 @@
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
-from .mixins import UUIDMixin, TimeStampedMixin
-from django.core.validators import MinValueValidator, MaxValueValidator
 from django.utils.translation import gettext_lazy as _
+
+from .mixins import TimeStampedMixin, UUIDMixin
 
 
 class Genre(UUIDMixin, TimeStampedMixin):
@@ -41,7 +42,8 @@ class Filmwork(UUIDMixin, TimeStampedMixin):
     title = models.TextField(_('Title'))
     description = models.TextField(_('Description'), blank=True)
     creation_date = models.DateField(_('Creation date'))
-    rating = models.FloatField(_('Rating'), blank=True, validators=[MinValueValidator(0), MaxValueValidator(100)])
+    rating = models.FloatField(_('Rating'), blank=True,
+                               validators=[MinValueValidator(0), MaxValueValidator(100)])
     type = models.TextField(_('Type'), choices=Types.choices, default=Types.MOVIE)
     certificate = models.TextField(_('Certificate'), blank=True, null=True)
     file_path = models.FileField(_('File'), blank=True, null=True, upload_to='movies/')
