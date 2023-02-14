@@ -1,7 +1,9 @@
+import psycopg2
+
 from data_extractor import SQLiteExtractor
 from data_loader import load_data
 from db_dataclasses import Genre, Person, Filmwork, GenreFilmwork, PersonFilmwork
-
+import sqlite3
 
 dsn = {
     "dbname": "movies_database",
@@ -12,16 +14,74 @@ dsn = {
     "options": "-c search_path=content",
 }
 
-from_table = "person"
-to_table = "person"
-from_fields = ["id", "full_name", "created_at", "updated_at"]
+from_db = 'db.sqlite'
+tables = ['genre', 'person', 'film_work', 'genre_film_work', 'person_film_work']
 
-if __name__ == "__main__":
-    extractor = SQLiteExtractor("db.sqlite")
-    records = []
-    for chunk in extractor.extract(from_table, from_fields):
-        for row in chunk:
-            record = Person(*row)
-            records.append(record)
-        load_data(records, to_table, **dsn)
-    extractor.close()
+
+class SQLiteConnection:
+    def __init__(self, db):
+        self.db = db
+
+    def __enter__(self):
+        self.conn = sqlite3.connect(self.db)
+        return self.conn
+
+    def __exit__(self, ex_type, ex_val, ex_tb):
+        if ex_type is not None:
+            self.conn.rollback()
+        else:
+            self.conn.commit()
+        self.conn.close()
+
+
+class PostgresConnection:
+    def __init__(self, dbname, user, password, host, port, options):
+        self.dbname = dbname
+        self.user = user
+        self.password = password
+        self.host = host
+        self.port = port
+        self.options = options
+
+    def __enter__(self):
+        self.conn = psycopg2.connect(dbname=self.dbname, user=self.user, password=self.password,
+                                     host=self.host, port=self.port, options=self.options)
+        return self.conn
+
+    def __exit__(self, ex_type, ex_val, ex_tb):
+        if ex_type is not None:
+            self.conn.rollback()
+        else:
+            self.conn.commit()
+        self.conn.close()
+
+
+if __name__ == '__main__':
+    with PostgresConnection(**dsn) as pg_conn:
+        for table in tables:
+            with SQLiteConnection(from_db) as sqlite_conn:
+                extractor = SQLiteExtractor(sqlite_conn)
+                records = []
+                curs_pg = pg_conn.cursor()
+                for chunk in extractor.extract(table):
+                    try:
+                        for row in chunk:
+                            if table == 'genre':
+                                record = Genre(*row)
+                                records.append(record)
+                            if table == 'person':
+                                record = Person(*row)
+                                records.append(record)
+                            if table == 'film_work':
+                                record = Filmwork(*row)
+                                records.append(record)
+                            if table == 'genre_film_work':
+                                record = GenreFilmwork(*row)
+                                records.append(record)
+                            if table == 'person_film_work':
+                                record = PersonFilmwork(*row)
+                                records.append(record)
+                    except Exception as e:
+                        print(f'Error occurred when saving to {table}: {e}')
+                    load_data(curs_pg, records, table)
+                    pg_conn.commit()

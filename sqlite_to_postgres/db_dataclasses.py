@@ -26,25 +26,25 @@ class Filmwork:
     title: str
     description: str
     creation_date: date
+    file_path: str
     rating: float
     type: str
     created: datetime
     modified: datetime
-    file_path: str
 
 
 @dataclass()
 class GenreFilmwork:
     id: UUID
-    genre_id: UUID
     film_work_id: UUID
+    genre_id: UUID
     created: datetime
 
 
 @dataclass()
 class PersonFilmwork:
     id: UUID
-    person_id: UUID
     film_work_id: UUID
+    person_id: UUID
     role: str
     created: datetime

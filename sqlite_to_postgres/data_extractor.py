@@ -1,21 +1,17 @@
-import sqlite3
-
-
 class SQLiteExtractor:
-    def __init__(self, db_file, chunk_size=66):
-        self.conn = sqlite3.connect(db_file)
+    def __init__(self, conn, chunk_size=1000):
+        self.conn = conn
         self.chunk_size = chunk_size
 
-    def extract(self, table, columns):
+    def extract(self, table):
         curs = self.conn.cursor()
-        query = f"SELECT {','.join(columns)} FROM {table}"
-        curs.execute(query)
-
+        try:
+            query = f"SELECT * FROM {table}"
+            curs.execute(query)
+        except ValueError:
+            print(f'No such table: {table}')
         while True:
             results = curs.fetchmany(self.chunk_size)
             if not results:
                 break
             yield results
-
-    def close(self):
-        self.conn.close()

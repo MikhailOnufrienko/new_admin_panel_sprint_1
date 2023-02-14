@@ -1,10 +1,7 @@
-import psycopg2
 from dataclasses import asdict
 
 
-def load_data(records, table, **dsn):
-    conn = psycopg2.connect(**dsn)
-    curs = conn.cursor()
+def load_data(curs, records, table):
     curs.execute(f"TRUNCATE {table};")
 
     for record in records:
@@ -15,5 +12,3 @@ def load_data(records, table, **dsn):
                     VALUES ({placeholders})
                  '''
         curs.execute(query, tuple(data.values()))
-    conn.commit()
-    conn.close()
