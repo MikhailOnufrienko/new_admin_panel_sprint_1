@@ -12,11 +12,6 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AddField(
             model_name='filmwork',
-            name='certificate',
-            field=models.TextField(blank=True, null=True, verbose_name='Certificate'),
-        ),
-        migrations.AddField(
-            model_name='filmwork',
             name='file_path',
             field=models.FileField(blank=True, null=True, upload_to='movies/', verbose_name='File'),
         ),

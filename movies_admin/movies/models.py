@@ -45,7 +45,6 @@ class Filmwork(UUIDMixin, TimeStampedMixin):
     rating = models.FloatField(_('Rating'), blank=True,
                                validators=[MinValueValidator(0), MaxValueValidator(100)])
     type = models.TextField(_('Type'), choices=Types.choices, default=Types.MOVIE)
-    certificate = models.TextField(_('Certificate'), blank=True, null=True)
     file_path = models.FileField(_('File'), blank=True, null=True, upload_to='movies/')
 
     class Meta:
