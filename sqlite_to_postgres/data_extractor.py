@@ -1,4 +1,6 @@
+import sqlite3
 from sqlite3 import Connection
+from my_logging import logger
 
 
 class SQLiteExtractor:
@@ -16,8 +18,9 @@ class SQLiteExtractor:
         try:
             query = f'SELECT * FROM {table}'
             curs.execute(query)
-        except ValueError:
-            print(f'No such table: {table}')
+        except sqlite3.OperationalError:
+            logger.error(f'No such table: {table}', exc_info=True)
+            raise SystemExit
         while True:
             results = curs.fetchmany(self.chunk_size)
             if not results:

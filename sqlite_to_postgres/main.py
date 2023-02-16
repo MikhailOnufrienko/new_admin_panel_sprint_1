@@ -10,21 +10,21 @@ from data_extractor import SQLiteExtractor
 from data_loader import load_data
 from db_dataclasses import (Filmwork, Genre, GenreFilmwork, Person,
                             PersonFilmwork)
-
+from my_logging import logger
 
 load_dotenv()
 
 dsn = {
-    'dbname': 'movies_database',
-    'user': 'postgres',
+    'dbname': os.environ.get('DB_NAME'),
+    'user': os.environ.get('DB_USER'),
     'password': os.environ.get('DB_PASSWORD'),
-    'host': '127.0.0.1',
-    'port': 5432,
+    'host': os.environ.get('DB_HOST', '127.0.0.1'),
+    'port': os.environ.get('DB_PORT', 5432),
     'options': '-c search_path=content',
 }
 
 from_db = 'db.sqlite'
-tables = ['genre', 'person', 'film_work', 'genre_film_work', 'person_film_work']
+tables = ['genres', 'persons', 'film_works', 'genre_film_works', 'person_film_works']
 
 
 class SQLiteConnection:
@@ -95,7 +95,8 @@ if __name__ == '__main__':
                                 records.append(record)
 
                     except Exception as e:
-                        print(f'Error occurred when saving to {table}: {e}')
+                        logger.exception(f'Error occurred when saving to {table}: {e}')
+                        raise SystemExit
 
                     load_data(curs_pg, records, table)
                     pg_conn.commit()
