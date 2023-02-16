@@ -24,7 +24,7 @@ dsn = {
 }
 
 from_db = 'db.sqlite'
-tables = ['genres', 'persons', 'film_works', 'genre_film_works', 'person_film_works']
+tables = ['genre', 'person', 'film_work', 'genre_film_work', 'person_film_work']
 
 
 class SQLiteConnection:

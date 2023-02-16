@@ -1,19 +1,22 @@
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, fields
 from typing import Type
 
 from psycopg2.extensions import cursor
+from psycopg2.extras import execute_batch
 
 
-def load_data(curs: cursor, records: Type[dataclass], table: str) -> None:
+def load_data(curs: cursor, records: list[Type[dataclass]], table: str) -> None:
     """Write the extracted data to a PostgreSQL database.
 
     """
 
     curs.execute(f'TRUNCATE {table};')
-
+    columns = tuple(asdict(records[0]).keys())
+    columns_no_quotes = ','.join(tuple(asdict(records[0]).keys()))
+    placeholders = ', '.join(['%s'] * len(columns))
+    query = f'INSERT INTO {table} ({columns_no_quotes}) VALUES ({placeholders})'
+    vals = []
     for record in records:
         data = asdict(record)
-        columns = ', '.join(data.keys())
-        placeholders = ', '.join(['%s'] * len(data))
-        query = f'INSERT INTO {table} ({columns}) VALUES ({placeholders})'
-        curs.execute(query, tuple(data.values()))
+        vals.append(tuple(data.values()))
+    execute_batch(curs, query, vals)
