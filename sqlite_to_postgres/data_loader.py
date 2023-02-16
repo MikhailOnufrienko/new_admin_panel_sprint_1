@@ -5,6 +5,17 @@ from psycopg2.extensions import cursor
 from psycopg2.extras import execute_batch
 
 
+FIELDS_MAPPING = {
+    'id': 'id',
+    'created_at': 'created',
+    'updated_at': 'modified',
+    'name': 'name',
+    'full_name': 'full_name',
+    'description': 'description',
+    'role': 'role'
+}
+
+
 def load_data(curs: cursor, records: list[Type[dataclass]], table: str) -> None:
     """Write the extracted data to a PostgreSQL database.
 

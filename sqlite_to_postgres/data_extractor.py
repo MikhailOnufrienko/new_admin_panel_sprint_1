@@ -13,7 +13,8 @@ class SQLiteExtractor:
         self.conn = conn
         self.chunk_size = chunk_size
 
-    def extract(self, table: str) -> list:
+    def extract(self, table: str) -> list[sqlite3.Row]:
+        self.conn.row_factory = sqlite3.Row
         curs = self.conn.cursor()
         try:
             query = f'SELECT * FROM {table}'

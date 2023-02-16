@@ -1,5 +1,6 @@
 import os
 import sqlite3
+from dataclasses import asdict
 from typing import Type, Union
 
 from dotenv import load_dotenv
@@ -8,8 +9,8 @@ from psycopg2.extensions import connection
 
 from data_extractor import SQLiteExtractor
 from data_loader import load_data
-from db_dataclasses import (Filmwork, Genre, GenreFilmwork, Person,
-                            PersonFilmwork)
+from db_dataclasses import (Genre, GenreFilmwork, Filmwork,
+                            Person, PersonFilmwork)
 from my_logging import logger
 
 load_dotenv()
@@ -24,7 +25,7 @@ dsn = {
 }
 
 from_db = 'db.sqlite'
-tables = ['genres', 'person', 'film_work', 'genre_film_work', 'person_film_work']
+tables = ['genre']
 
 
 class SQLiteConnection:
@@ -67,20 +68,40 @@ class PostgresConnection:
         self.conn.close()
 
 
+def prepare_data(field: str) -> str:
+    """Modify the name of the given table field if
+    it presents in fields_mapping dict.
+
+    """
+
+    fields_mapping = {
+        'created_at': 'created',
+        'updated_at': 'modified',
+    }
+    if field in list(fields_mapping.keys()):
+        return fields_mapping[field]
+    return field
+
+
 if __name__ == '__main__':
     with PostgresConnection(**dsn) as pg_conn:
         for table in tables:
             with SQLiteConnection(from_db) as sqlite_conn:
                 extractor = SQLiteExtractor(sqlite_conn)
-                records = []
+                target_records = []
                 curs_pg = pg_conn.cursor()
 
                 for chunk in extractor.extract(table):
                     try:
                         for row in chunk:
+                            target_record_dict = {}
                             if table == 'genre':
-                                record = Genre(*row)
-                                records.append(record)
+                                source_data = dict(**row)
+                                for field_name, field_value in source_data.items():
+                                    target_field_name = prepare_data(field_name)
+                                    target_record_dict[target_field_name] = field_value
+                                target_record = Genre(**target_record_dict)
+                                target_records.append(target_record)
                             if table == 'person':
                                 record = Person(*row)
                                 records.append(record)
@@ -97,6 +118,5 @@ if __name__ == '__main__':
                     except Exception as e:
                         logger.exception('Error occurred when saving to %s: {%s}', table, e)
                         raise SystemExit
-
-                    load_data(curs_pg, records, table)
+                    load_data(curs_pg, target_records, table)
                     pg_conn.commit()
