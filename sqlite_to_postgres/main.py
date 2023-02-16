@@ -1,8 +1,10 @@
 import os
 import sqlite3
+from typing import Type, Union
 
 from dotenv import load_dotenv
 import psycopg2
+from psycopg2.extensions import connection
 
 from data_extractor import SQLiteExtractor
 from data_loader import load_data
@@ -26,14 +28,14 @@ tables = ['genre', 'person', 'film_work', 'genre_film_work', 'person_film_work']
 
 
 class SQLiteConnection:
-    def __init__(self, db):
+    def __init__(self, db: str) -> None:
         self.db = db
 
-    def __enter__(self):
+    def __enter__(self) -> sqlite3.Connection:
         self.conn = sqlite3.connect(self.db)
         return self.conn
 
-    def __exit__(self, ex_type, ex_val, ex_tb):
+    def __exit__(self, ex_type: Union[Type[BaseException], None], ex_val: str, ex_tb: str) -> None:
         if ex_type is not None:
             self.conn.rollback()
         else:
@@ -42,7 +44,9 @@ class SQLiteConnection:
 
 
 class PostgresConnection:
-    def __init__(self, dbname, user, password, host, port, options):
+    def __init__(
+            self, dbname: str, user: str, password: str, host: str, port: int, options: str
+    ) -> None:
         self.dbname = dbname
         self.user = user
         self.password = password
@@ -50,12 +54,12 @@ class PostgresConnection:
         self.port = port
         self.options = options
 
-    def __enter__(self):
+    def __enter__(self) -> connection:
         self.conn = psycopg2.connect(dbname=self.dbname, user=self.user, password=self.password,
                                      host=self.host, port=self.port, options=self.options)
         return self.conn
 
-    def __exit__(self, ex_type, ex_val, ex_tb):
+    def __exit__(self, ex_type: Union[Type[BaseException], None], ex_val: str, ex_tb: str) -> None:
         if ex_type is not None:
             self.conn.rollback()
         else:

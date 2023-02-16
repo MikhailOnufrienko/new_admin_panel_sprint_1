@@ -1,7 +1,10 @@
-from dataclasses import asdict
+from dataclasses import asdict, dataclass
+from typing import Type
+
+from psycopg2.extensions import cursor
 
 
-def load_data(curs, records, table):
+def load_data(curs: cursor, records: Type[dataclass], table: str) -> None:
     """Write the extracted data to a PostgreSQL database.
 
     """

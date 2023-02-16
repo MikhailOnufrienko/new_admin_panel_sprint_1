@@ -1,14 +1,17 @@
+from sqlite3 import Connection
+
+
 class SQLiteExtractor:
     """A class to represent the mechanism of extracting data
     from an SQLite database.
 
-    The data are extracted by chunks.
+    Data are extracted by chunks.
     """
-    def __init__(self, conn, chunk_size=1000):
+    def __init__(self, conn: Connection, chunk_size: int = 1000) -> None:
         self.conn = conn
         self.chunk_size = chunk_size
 
-    def extract(self, table):
+    def extract(self, table: str) -> list:
         curs = self.conn.cursor()
         try:
             query = f'SELECT * FROM {table}'
