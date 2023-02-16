@@ -14,11 +14,11 @@ base_path = Path(__file__).resolve().parent.parent.parent
 sqlite_db = (base_path / 'sqlite_to_postgres/db.sqlite')
 tables = ['genre', 'person', 'film_work', 'genre_film_work', 'person_film_work']
 postgres_dsn = {
-    'dbname': 'movies_database',
-    'user': 'postgres',
+    'dbname': os.environ.get('DB_NAME'),
+    'user': os.environ.get('DB_USER'),
     'password': os.environ.get('DB_PASSWORD'),
-    'host': '127.0.0.1',
-    'port': 5432,
+    'host': os.environ.get('DB_HOST', '127.0.0.1'),
+    'port': os.environ.get('DB_PORT', 5432),
     'options': '-c search_path=content',
 }
 

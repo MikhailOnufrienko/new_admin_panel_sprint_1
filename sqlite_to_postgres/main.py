@@ -1,6 +1,5 @@
 import os
 import sqlite3
-from dataclasses import asdict
 from typing import Type, Union
 
 from dotenv import load_dotenv
@@ -25,7 +24,7 @@ dsn = {
 }
 
 from_db = 'db.sqlite'
-tables = ['genre']
+tables = ['genre', 'person', 'film_work', 'genre_film_work', 'person_film_work']
 
 
 class SQLiteConnection:
@@ -36,7 +35,12 @@ class SQLiteConnection:
         self.conn = sqlite3.connect(self.db)
         return self.conn
 
-    def __exit__(self, ex_type: Union[Type[BaseException], None], ex_val: str, ex_tb: str) -> None:
+    def __exit__(
+            self,
+            ex_type: Union[Type[BaseException], None],
+            ex_val: str,
+            ex_tb: str
+    ) -> None:
         if ex_type is not None:
             self.conn.rollback()
         else:
@@ -46,7 +50,13 @@ class SQLiteConnection:
 
 class PostgresConnection:
     def __init__(
-            self, dbname: str, user: str, password: str, host: str, port: int, options: str
+            self,
+            dbname: str,
+            user: str,
+            password: str,
+            host: str,
+            port: int,
+            options: str
     ) -> None:
         self.dbname = dbname
         self.user = user
@@ -56,11 +66,20 @@ class PostgresConnection:
         self.options = options
 
     def __enter__(self) -> connection:
-        self.conn = psycopg2.connect(dbname=self.dbname, user=self.user, password=self.password,
-                                     host=self.host, port=self.port, options=self.options)
+        self.conn = psycopg2.connect(
+            dbname=self.dbname,
+            user=self.user,
+            password=self.password,
+            host=self.host,
+            port=self.port,
+            options=self.options)
         return self.conn
 
-    def __exit__(self, ex_type: Union[Type[BaseException], None], ex_val: str, ex_tb: str) -> None:
+    def __exit__(self,
+                 ex_type: Union[Type[BaseException], None],
+                 ex_val: str,
+                 ex_tb: str
+    ) -> None:
         if ex_type is not None:
             self.conn.rollback()
         else:
@@ -83,6 +102,24 @@ def prepare_data(field: str) -> str:
     return field
 
 
+def append_target_record(table_name: str) -> None:
+    """Append a record to the given table.
+
+    """
+
+    table_to_dataclass = {
+        'genre': Genre,
+        'person': Person,
+        'film_work': Filmwork,
+        'genre_film_work': GenreFilmwork,
+        'person_film_work': PersonFilmwork
+    }
+
+    dataclass_name = table_to_dataclass[table_name]
+    target_record = dataclass_name(**target_record_dict)
+    target_records.append(target_record)
+
+
 if __name__ == '__main__':
     with PostgresConnection(**dsn) as pg_conn:
         for table in tables:
@@ -95,26 +132,11 @@ if __name__ == '__main__':
                     try:
                         for row in chunk:
                             target_record_dict = {}
-                            if table == 'genre':
-                                source_data = dict(**row)
-                                for field_name, field_value in source_data.items():
-                                    target_field_name = prepare_data(field_name)
-                                    target_record_dict[target_field_name] = field_value
-                                target_record = Genre(**target_record_dict)
-                                target_records.append(target_record)
-                            if table == 'person':
-                                record = Person(*row)
-                                records.append(record)
-                            if table == 'film_work':
-                                record = Filmwork(*row)
-                                records.append(record)
-                            if table == 'genre_film_work':
-                                record = GenreFilmwork(*row)
-                                records.append(record)
-                            if table == 'person_film_work':
-                                record = PersonFilmwork(*row)
-                                records.append(record)
-
+                            source_data = dict(**row)
+                            for field_name, field_value in source_data.items():
+                                target_field_name = prepare_data(field_name)
+                                target_record_dict[target_field_name] = field_value
+                            append_target_record(table)
                     except Exception as e:
                         logger.exception('Error occurred when saving to %s: {%s}', table, e)
                         raise SystemExit
