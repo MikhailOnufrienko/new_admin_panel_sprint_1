@@ -24,7 +24,7 @@ dsn = {
 }
 
 from_db = 'db.sqlite'
-tables = ['genre', 'person', 'film_work', 'genre_film_work', 'person_film_work']
+tables = ['genres', 'person', 'film_work', 'genre_film_work', 'person_film_work']
 
 
 class SQLiteConnection:
@@ -95,7 +95,7 @@ if __name__ == '__main__':
                                 records.append(record)
 
                     except Exception as e:
-                        logger.exception(f'Error occurred when saving to {table}: {e}')
+                        logger.exception('Error occurred when saving to %s: {%s}', table, e)
                         raise SystemExit
 
                     load_data(curs_pg, records, table)

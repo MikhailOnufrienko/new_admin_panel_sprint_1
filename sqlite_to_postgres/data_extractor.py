@@ -19,7 +19,7 @@ class SQLiteExtractor:
             query = f'SELECT * FROM {table}'
             curs.execute(query)
         except sqlite3.OperationalError:
-            logger.error(f'No such table: {table}', exc_info=True)
+            logger.error('No such table: %s', table, exc_info=True)
             raise SystemExit
         while True:
             results = curs.fetchmany(self.chunk_size)
