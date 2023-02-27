@@ -46,6 +46,8 @@ class Filmwork(UUIDMixin, TimeStampedMixin):
                                validators=[MinValueValidator(0), MaxValueValidator(100)])
     type = models.TextField(_('Type'), choices=Types.choices, default=Types.MOVIE)
     file_path = models.FileField(_('File'), blank=True, null=True, upload_to='movies/')
+    genres = models.ManyToManyField(Genre, through='GenreFilmwork')
+    persons = models.ManyToManyField(Person, through='PersonFilmwork')
 
     class Meta:
         db_table = "content\".\"film_work"
